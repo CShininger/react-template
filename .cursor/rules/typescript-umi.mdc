@@ -1,0 +1,35 @@
+---
+description: TypeScript 与 Umi Max 配置、路由、静态资源
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript 与 Umi 配置
+
+## TypeScript
+
+- `tsconfig.json` 继承 `src/.umi/tsconfig.json`，勿删该继承
+- 全局类型：`typings.d.ts`（已含 `@umijs/max/typings`）
+- 优先 **interface** 描述对象
+- API 类型放 `src/services/**/typings.d.ts`；跨模块领域类型放 `src/types/`
+- 常量、枚举放 `src/constants/`，不要在页面里散落魔法数字
+
+## 路由（`.umirc.ts`）
+
+- 新页面：先建 `src/pages/Foo/index.tsx`，再增 `routes` 项 `component: './Foo'`
+- 重定向、layout 标题等与现有写法保持一致
+- 勿在业务代码硬编码 base/publicPath；部署子路径用 `base` / `publicPath` 配置
+
+## 静态脚本与资源
+
+- 独立 JS 进 HTML：`headScripts` / `scripts` + **`public/`** 下文件，或 CDN URL
+- 图片、字体放 **`src/assets/`**，用 **import** 打进 bundle；不要用 `import '/public/...'`
+
+## Tailwind
+
+- 入口：`tailwind.css`；配置 `tailwind.config.js` 的 `content` 需包含实际写 class 的 tsx 路径
+- 大改样式后若 utility 未生效，检查 content 与是否重启 dev
+
+## 工程命令（改依赖/插件后）
+
+`pnpm install` → 自动 `max setup`；异常时手动 `pnpm setup`

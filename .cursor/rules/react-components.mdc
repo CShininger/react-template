@@ -1,0 +1,63 @@
+---
+description: React 页面与组件约定（Max + antd）
+globs: "**/*.{tsx,jsx}"
+alwaysApply: false
+---
+
+# 组件与页面规则
+
+## 组件形态
+
+- 仅使用 **函数组件**；导出默认组件作为页面/组件入口
+- 页面：`src/pages/<Name>/index.tsx`，路由在 `.umirc.ts` 声明
+- 仅本页使用的 UI：`src/pages/<Name>/components/<Comp>/index.tsx`
+- 跨页面 UI：`src/components/<Comp>/index.tsx`（复杂时可拆 `index.tsx` + `index.less`）
+- 仅本页使用的 hook 放页面目录；跨页面 hook 放 `src/hooks/useXxx.ts`
+- 布局放 `src/layouts/`，路由守卫放 `src/wrappers/`，都要在 `.umirc.ts` 里显式引用
+
+## 命名
+
+- 组件名、目录：**PascalCase**（如 `UserCard/`）
+- 事件处理：`handleXxx`；布尔 props：`isXxx` / `showXxx`
+
+## 导入顺序
+
+组与组之间空一行，组内按路径字母序。顺序固定为：
+
+1. 副作用导入（样式除外）
+2. 第三方包，`react` 开头的在最前
+3. `@/` 别名
+4. 相对路径
+5. 样式（`.less` / `.css` / `.scss`）放最后
+
+## 样式引用
+
+- 组件/页面样式：**同目录** `index.less` + `import styles from './index.less'`
+- 类名使用 `styles.xxx`，与 Less 嵌套层级对应（见 less-styles 规则）
+- antd 组件优先用官方 API；布局类页面可用 Max **ProLayout**（已开 `layout` 插件）
+
+## 数据与副作用
+
+- 接口：`src/services/`，页面内不裸写 fetch 散落
+- 跨页状态：`src/models/` + `useModel`；局部用 `useState` / `useRequest`
+- 纯函数放 `src/utils/`，常量与枚举放 `src/constants/`
+- 权限：`src/access.ts` + 路由 `access` 字段；进页守卫用 `src/wrappers/`
+
+## 示例骨架
+
+```tsx
+import styles from './index.less'
+
+export default function HomePage() {
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.content}>{/* ... */}</div>
+    </div>
+  )
+}
+```
+
+## 避免
+
+- 在 `pages` 里堆业务无关的巨型组件（应下沉到 `components`）
+- `any` 类型；能推断则省略冗余类型注解

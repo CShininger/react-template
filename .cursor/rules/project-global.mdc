@@ -1,0 +1,60 @@
+---
+description: 项目全局约定（Umi Max 栈、目录、工具链、禁止事项）
+alwaysApply: true
+---
+
+# 全局规则
+
+## 技术栈
+
+- **框架**: `@umijs/max` 4.x + React 18 + TypeScript
+- **包管理**: 仅使用 **pnpm**（`npmClient: 'pnpm'`）
+- **样式**: Less（CSS Modules）+ Tailwind（`tailwindcss: {}`）；二者可并存，同一节点避免混用冲突类名
+- **质量**: ESLint 主导（`@umijs/max/eslint`、`eslint-plugin-prettier`、`simple-import-sort`）；风格配置在 `.prettierrc`
+
+## 目录约定
+
+| 路径 | 用途 |
+|------|------|
+| `src/pages/` | 路由页面，与 `.umirc.ts` 中 `component: './Xxx'` 对应。只给本页用的组件、hooks 放在该页目录内 |
+| `src/layouts/` | 配置路由里显式引用的布局（如登录空白壳）。全站 ProLayout 由 `layout` 插件提供，不要在这里再套一层重复壳 |
+| `src/wrappers/` | 路由包装（鉴权、守卫），在 `.umirc.ts` 用 `wrappers` 引用 |
+| `src/components/` | 跨页面复用 UI，目录 **PascalCase** |
+| `src/hooks/` | 跨页面复用 hooks，文件名 `useXxx.ts` |
+| `src/services/` | 接口请求封装；类型放同目录 `typings.d.ts` |
+| `src/models/` | 跨页 Max model（`useModel`）。只服务单页的状态不要放这里 |
+| `src/utils/` | 无 UI、无请求的纯函数 |
+| `src/constants/` | 常量、枚举 |
+| `src/types/` | 跨模块领域类型。接口入参出参仍放 `services/` |
+| `src/styles/` | 全局 Less 变量，入口 `variables.less`。由 `lessLoader` 注入，Less 文件里直接写变量名 |
+| `src/assets/` | 打进 bundle 的图片、字体，业务代码用 `import` 引用 |
+| `src/access.ts` | 权限定义 |
+| `src/app.ts` | 运行时配置（layout、getInitialState 等） |
+| `public/` | 不经打包的静态资源（favicon 等）；`headScripts` 引用 `/xxx.js` |
+| `.umirc.ts` | 构建与路由主配置 |
+
+**勿改** `src/.umi*`、`dist/`（生成物）；改配置后必要时 `pnpm setup` / 重启 dev。
+
+## 代码习惯
+
+- 从 **`@umijs/max`** 导入路由/模型等能力（如 `useModel`、`history`），避免直接依赖裸 `umi` 包
+- 变更范围 **最小化**：不顺带改无关文件、不擅自加 README/说明文档
+- 提交：仅在用户明确要求时执行 git commit；不 force push main
+- 与用户沟通使用 **简体中文**
+
+## 生成 / 修改代码后（必做）
+
+完成本轮涉及文件的编辑后，**必须执行格式化**（Agent 自行跑终端，不要只提醒用户）：
+
+1. **Prettier**：对本次改动过的文件执行
+   `pnpm exec prettier --write <文件路径...>`
+   若改动面大或路径较多，可 `pnpm format` 格式化全仓。
+2. **ESLint 自动修复**（改动了 `src/**/*.{ts,tsx}` 时）：
+   `pnpm exec eslint --fix <改动过的 ts/tsx 路径...>`
+   或 `pnpm lint:fix`（仅 `src` 下 TS/TSX）。
+
+仅改 `.less` / 配置 / JSON 等时，至少跑 Prettier 覆盖对应路径。格式化失败须修复后重跑，再结束任务。
+
+## 常用命令
+
+`pnpm dev` · `pnpm build` · `pnpm lint` · `pnpm lint:fix` · `pnpm format` · `pnpm tsc`

@@ -1,0 +1,51 @@
+---
+description: Less 与 CSS Modules 写法（层级、变量、与 Umi autoCSSModules）
+globs: "**/*.less"
+alwaysApply: false
+---
+
+# Less 规则
+
+## CSS Modules（Umi 默认 `autoCSSModules: true`）
+
+```tsx
+// ✅ 局部样式：默认 import 绑定 → 自动 Modules
+import styles from './index.less'
+<div className={styles.wrapper} />
+
+// ❌ 除非刻意要全局污染，不要用副作用引入
+import './index.less'
+```
+
+文件名 **`index.less`** 即可，不必强制 `*.module.less`；需要显式区分时可保留 `.module.less`。
+
+## 层级与 TSX 对齐
+
+Less **嵌套结构必须与 JSX DOM 层级一致**：父容器包裹子选择器，禁止把本应嵌套的块写成与根平级。
+
+```less
+// ✅
+.wrapper {
+  .card {
+    .title { }
+    .tags {
+      .tag { }
+    }
+  }
+}
+```
+
+TSX 中仍使用 `styles.wrapper`、`styles.card` 等**扁平键名**；编译后会生成带父子关系的选择器。
+
+## 变量与组织
+
+- 只在当前文件使用的颜色、间距，写在该文件顶部
+- 跨文件共用变量放 `src/styles/variables.less`。`.umirc.ts` 已通过 `lessLoader` 注入，Less 文件里直接写 `@color-text`、`@space-md`，不要再 `@import`
+- 不要在 `src/styles/` 里写选择器，这里只放变量和混入
+- 页面级样式与组件 **同目录** 放置：`index.tsx` + `index.less`
+- 优先 Less 布局/主题；Tailwind 适合快速 utility，同一元素不要堆叠语义重复的样式
+
+## 避免
+
+- 在 Less 里写全局标签选择器（`h1 {}`）污染全站
+- 用 `!important` 覆盖 antd，优先 token / `ConfigProvider`
