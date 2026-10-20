@@ -1,6 +1,6 @@
 ---
 description: 样式优先级（优先 Tailwind；复杂样式或改 antd 全局才用 Less）
-globs: "**/*.{tsx,jsx,less}"
+globs: **/*.tsx, **/*.less, tailwind.config.js, tailwind.css
 alwaysApply: false
 ---
 

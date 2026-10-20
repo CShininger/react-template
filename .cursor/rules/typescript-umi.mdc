@@ -1,6 +1,6 @@
 ---
 description: TypeScript 与 Umi Max 配置、路由、静态资源
-globs: "**/*.{ts,tsx}"
+globs: **/*.ts, **/*.tsx, tailwind.config.js, tailwind.css
 alwaysApply: false
 ---
 

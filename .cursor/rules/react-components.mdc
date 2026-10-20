@@ -1,6 +1,6 @@
 ---
 description: React 页面与组件约定（Max + antd）
-globs: "**/*.{tsx,jsx}"
+globs: **/*.tsx
 alwaysApply: false
 ---
 
