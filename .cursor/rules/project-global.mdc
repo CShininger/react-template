@@ -9,7 +9,7 @@ alwaysApply: true
 
 - **框架**: `@umijs/max` 4.x + React 18 + TypeScript
 - **包管理**: 仅使用 **pnpm**（`npmClient: 'pnpm'`）
-- **样式**: Less（CSS Modules）+ Tailwind（`tailwindcss: {}`）；二者可并存，同一节点避免混用冲突类名
+- **样式**: 优先 **Tailwind**（`tailwindcss: {}`）；复杂样式或改 antd 全局才用 Less（CSS Modules）。同一节点避免混用冲突类名
 - **质量**: ESLint 主导（`@umijs/max/eslint`、`eslint-plugin-prettier`、`simple-import-sort`）；风格配置在 `.prettierrc`
 
 ## 目录约定

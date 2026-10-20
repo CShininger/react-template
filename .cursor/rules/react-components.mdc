@@ -11,7 +11,7 @@ alwaysApply: false
 - 仅使用 **函数组件**；导出默认组件作为页面/组件入口
 - 页面：`src/pages/<Name>/index.tsx`，路由在 `.umirc.ts` 声明
 - 仅本页使用的 UI：`src/pages/<Name>/components/<Comp>/index.tsx`
-- 跨页面 UI：`src/components/<Comp>/index.tsx`（复杂时可拆 `index.tsx` + `index.less`）
+- 跨页面 UI：`src/components/<Comp>/index.tsx`（复杂样式或改 antd 全局时再加同目录 `index.less`）
 - 仅本页使用的 hook 放页面目录；跨页面 hook 放 `src/hooks/useXxx.ts`
 - 布局放 `src/layouts/`，路由守卫放 `src/wrappers/`，都要在 `.umirc.ts` 里显式引用
 
@@ -32,9 +32,9 @@ alwaysApply: false
 
 ## 样式引用
 
-- 组件/页面样式：**同目录** `index.less` + `import styles from './index.less'`
-- 类名使用 `styles.xxx`，与 Less 嵌套层级对应（见 less-styles 规则）
-- antd 组件优先用官方 API；布局类页面可用 Max **ProLayout**（已开 `layout` 插件）
+- **优先 Tailwind** className；复杂样式或改 antd 全局才用同目录 `index.less`（见 less-styles 规则）
+- 用了 Less 时：`import styles from './index.less'`，类名 `styles.xxx` 与嵌套层级对应
+- antd 组件优先用官方 API、token、`ConfigProvider`；布局类页面可用 Max **ProLayout**（已开 `layout` 插件）
 
 ## 数据与副作用
 
@@ -46,12 +46,10 @@ alwaysApply: false
 ## 示例骨架
 
 ```tsx
-import styles from './index.less'
-
 export default function HomePage() {
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.content}>{/* ... */}</div>
+    <div className="p-6">
+      <div className="text-base">{/* ... */}</div>
     </div>
   )
 }

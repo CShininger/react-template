@@ -1,51 +1,74 @@
 ---
-description: Less 与 CSS Modules 写法（层级、变量、与 Umi autoCSSModules）
-globs: "**/*.less"
+description: 样式优先级（优先 Tailwind；复杂样式或改 antd 全局才用 Less）
+globs: "**/*.{tsx,jsx,less}"
 alwaysApply: false
 ---
 
-# Less 规则
+# 样式规则
 
-## CSS Modules（Umi 默认 `autoCSSModules: true`）
+## 优先级
+
+- **默认用 Tailwind** utility class 写布局、间距、排版、颜色、显隐
+- **仅在下面两种情况用 Less**（CSS Modules）：
+  1. **复杂样式**：多状态、深层结构、伪元素 / 伪类、动画、keyframes，用 utility 难以表达或会堆出难读的长 class
+  2. **改 antd 全局 / 组件内部样式**：覆盖 antd 内部 DOM、需要 `:global` 时
+- antd 外观先用官方 API、token、`ConfigProvider`；仍盖不住内部节点时，再用 Less `:global`
+- 同一元素不要同时写语义重复的 Tailwind class 和 Less
+
+## Tailwind
+
+```tsx
+<div className="flex items-center gap-4 p-4 text-sm text-gray-700" />
+```
+
+- 条件类名用模板字符串或现有 class 合并方式，避免为几个 utility 再开一个 Less 文件
+- 入口 `tailwind.css`；`tailwind.config.js` 的 `content` 需覆盖实际写 class 的路径
+
+## Less（仅复杂样式或改 antd 全局）
 
 ```tsx
 // ✅ 局部样式：默认 import 绑定 → 自动 Modules
 import styles from './index.less'
 <div className={styles.wrapper} />
 
-// ❌ 除非刻意要全局污染，不要用副作用引入
+// ❌ 除非要改全局（含 antd 全局覆盖），不要用副作用引入
 import './index.less'
 ```
 
-文件名 **`index.less`** 即可，不必强制 `*.module.less`；需要显式区分时可保留 `.module.less`。
+文件名 **`index.less`** 即可，不必强制 `*.module.less`。页面级 Less 与组件同目录：`index.tsx` + `index.less`。
 
-## 层级与 TSX 对齐
-
-Less **嵌套结构必须与 JSX DOM 层级一致**：父容器包裹子选择器，禁止把本应嵌套的块写成与根平级。
+覆盖 antd 内部节点用 `:global`，选择器挂在本组件根类下，避免裸全局标签污染全站：
 
 ```less
-// ✅
 .wrapper {
-  .card {
-    .title { }
-    .tags {
-      .tag { }
-    }
+  :global {
+    .ant-btn { }
   }
 }
 ```
 
-TSX 中仍使用 `styles.wrapper`、`styles.card` 等**扁平键名**；编译后会生成带父子关系的选择器。
+### 层级与 TSX 对齐
 
-## 变量与组织
+Less **嵌套必须与 JSX DOM 层级一致**：父容器包裹子选择器。
+
+```less
+.wrapper {
+  .card {
+    .title { }
+  }
+}
+```
+
+TSX 仍用 `styles.wrapper`、`styles.card` 等**扁平键名**。
+
+### 变量
 
 - 只在当前文件使用的颜色、间距，写在该文件顶部
-- 跨文件共用变量放 `src/styles/variables.less`。`.umirc.ts` 已通过 `lessLoader` 注入，Less 文件里直接写 `@color-text`、`@space-md`，不要再 `@import`
-- 不要在 `src/styles/` 里写选择器，这里只放变量和混入
-- 页面级样式与组件 **同目录** 放置：`index.tsx` + `index.less`
-- 优先 Less 布局/主题；Tailwind 适合快速 utility，同一元素不要堆叠语义重复的样式
+- 跨文件共用变量放 `src/styles/variables.less`。`lessLoader` 已注入，直接写 `@color-text`、`@space-md`，不要再 `@import`
+- `src/styles/` 只放变量和混入，不写选择器
 
 ## 避免
 
+- 能用 Tailwind 表达的布局、间距、颜色，不要再建 `index.less`
 - 在 Less 里写全局标签选择器（`h1 {}`）污染全站
-- 用 `!important` 覆盖 antd，优先 token / `ConfigProvider`
+- 用 `!important` 覆盖 antd
